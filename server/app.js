@@ -62,7 +62,7 @@ app.post("/people", function(req,res){
       });
       query.on('error', function(err){
         done();
-        console.log('Error running query: ' err);
+        console.log('Error running query: ' , err);
         res.status(500).send(err);
       });
     }
@@ -86,7 +86,7 @@ app.get("/people", function(req,res){
       });
       query.on('error', function(err){
         done();
-        console.log('Error running query: ' err);
+        console.log('Error running query: ', err);
         res.status(500).send(err);
       });
     }
@@ -112,7 +112,7 @@ app.post("/patronus", function(req,res){
       });
       query.on('error', function(err){
         done();
-        console.log('Error running query: ' err);
+        console.log('Error running query: ', err);
         res.status(500).send(err);
       });
     }
@@ -136,7 +136,7 @@ app.get("/patronus", function(req,res){
       });
       query.on('error', function(err){
         done();
-        console.log('Error running query: ' err);
+        console.log('Error running query: ', err);
         res.status(500).send(err);
       });
     }
