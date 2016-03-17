@@ -67,6 +67,9 @@ pg.connect(connectionString, function(err, client,done){
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+app.use("/",peopleRouter);
+app.use("/",patronusRouter);
+
 app.set("port",(process.env.PORT || 5000));
 
 app.get("/*", function(req,res){
@@ -77,3 +80,5 @@ app.get("/*", function(req,res){
 app.listen(app.get("port"),function(){
   console.log("Listening on port: ", app.get("port"));
 });
+
+module.exports = app;

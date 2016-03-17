@@ -1,6 +1,22 @@
 var express = require('express');
 var router = express.Router();
+var app = express();
 var path = require('path');
+var pg = require('pg');
+
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+var connectionString;
+
+if(process.env.DATABASE_URL){
+  pg.defaults.ssl = true;
+  connectionString = process.env.DATABASE_URL;
+} else {
+  connectionString = 'postgres://localhost:5432/patronus_DB';
+}
+
 
 router.get("/patronus", function(req,res){
   //not exactly sure what this will do
@@ -38,8 +54,8 @@ router.post("/patronus", function(req,res){
     }else{
       var result = [];
 
-      var query = client.query('INSERT INTO patronus (name) VALUES ($1) '
-                + 'RETURNING id, name', [req.body.name]);
+      var query = client.query('INSERT INTO patronus_table (patronus_name) VALUES ($1) '
+                + 'RETURNING id, patronus_name', [req.body.patronus_name]);
       query.on('row', function(row){
         result.push(row);
       });
@@ -47,6 +63,10 @@ router.post("/patronus", function(req,res){
         done();
         console.log('Error running query: ', err);
         res.status(500).send(err);
+      });
+      query.on('end', function(end){
+        done();
+        res.send(result);
       });
     }
   });

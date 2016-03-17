@@ -1,0 +1,46 @@
+body {
+  font-family: "adobe-garamond-pro",sans-serif;
+  background-color: #16193B;
+  color: black;
+}
+
+div.container-fluid {
+
+}
+
+div.header-display {
+background-color: #35478C;
+color: #FFFFFF;
+text-align: center;
+}
+
+div.people-input {
+  background-color: #4E7AC7;
+  text-align: center;
+  border-radius: 5px;
+  padding-bottom: 10px;
+}
+
+div.patronus-input {
+  background-color: #4E7AC7;
+  text-align: center;
+  border-radius: 5px;
+  padding-bottom: 10px;
+  color:#FFFFFF;
+}
+
+div.people {
+  background-color: #4E7AC7;
+  text-align: center;
+  border-radius: 5px;
+  padding-bottom: 10px;
+  color:black;
+}
+
+div.patronuses {
+  background-color: #4E7AC7;
+  text-align: center;
+  border-radius: 5px;
+  padding-bottom: 10px;
+  color:black;
+}
