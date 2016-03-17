@@ -1,12 +1,18 @@
+//********************************************************//
+//********** THE ALL-MIGHTY SERVER/APP.JS ****************//
+//********************************************************//
+
 var express = require("express");
 var app = express();
 var path = require("path");
 var bodyParser = require('body-parser');
 var pg = require('pg');
+var peopleRouter = require('./routes/people.js');
+var patronusRouter = require('./routes/patronus.js');
 
+
+// Sets up database upon nonexistence
 var connectionString;
-
-
 
 if(process.env.DATABASE_URL){
   pg.defaults.ssl = true;
@@ -15,135 +21,53 @@ if(process.env.DATABASE_URL){
   connectionString = 'postgres://localhost:5432/patronus_DB';
 }
 
+//*********** CONNECTS TO DB TO CREATE TABLES ***********//
 pg.connect(connectionString, function(err, client,done){
   if (err){
     console.log('Error connecting to the DB, yall: ', err)
   } else{
-    var query = client.query('CREATE TABLE IF NOT EXISTS people_table (' +
-      'id SERIAL PRIMARY KEY,' +
-      'name varchar(80) NOT NULL);' +
+    var query = client.query(
+
+      //  CREATES patronus_table,
+      //          columns:        id, patronus_name
+
       'CREATE TABLE IF NOT EXISTS patronus_table (' +
       'id SERIAL PRIMARY KEY,'+
-      'patronus_name varchar(80) NOT NULL);');
+      'patronus_name varchar(80) NOT NULL);' +
+
+      //  CREATES people_table,
+      //          columns:        id, first_name, last_name, patronus_key
+
+      'CREATE TABLE IF NOT EXISTS people_table (' +
+      'id SERIAL PRIMARY KEY,' +
+      'first_name varchar(80) NOT NULL,' +
+      'last_name varchar(80) NOT NULL,'+
+      'patronus_key INTEGER REFERENCES "public"."patronus_table"("id"));');
+
     query.on('end',function(){
       console.log('Successfully ensured our tables exist, OHHHH YEEEAAAAA!');
     });
+
     query.on('error', function(){
       console.log('Error creating your tables for you, you should probably do something about that...');
     });
   }
 });
-// ^^^^Database stuff up there^^^^
 
 
-// vvvvvv App stuff down there vvvvvvv
+// ^^^^Database stuff up there^^^^      //
+
+//******************************************************//
+
+
+
+// vvvvvv App stuff down here vvvvvvv   //
 
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("port",(process.env.PORT || 5000));
-
-app.post("/people", function(req,res){
-  //not exactly sure what this will do
-  console.log("Attempting to post to people DB")
-  pg.connect(connectionString, function(err, client, done){
-    if(err){
-      done();
-      console.log("Hey man, we couldn't write anything to your db, sorry :(");
-      res.status(500).send(err);
-    }else{
-      var result = [];
-
-      var query = client.query('INSERT INTO people_table (name) VALUES ($1) '
-                + 'RETURNING id, name', [req.body.name]);
-      query.on('row', function(row){
-        result.push(row);
-      });
-      query.on('error', function(err){
-        done();
-        console.log('Error running query: ' , err);
-        res.status(500).send(err);
-      });
-    }
-  });
-});
-
-app.get("/people", function(req,res){
-  //not exactly sure what this will do
-  console.log("Attempting to access people_table")
-  pg.connect(connectionString, function(err, client, done){
-    if(err){
-      done();
-      console.log("Hey man, we couldn't read anything from your people_table, sorry :(");
-      res.status(500).send(err);
-    }else{
-      var result = [];
-
-      var query = client.query('SELECT * FROM people_table');
-      query.on('row', function(row){
-        result.push(row);
-      });
-      query.on('error', function(err){
-        done();
-        console.log('Error running query: ', err);
-        res.status(500).send(err);
-      });
-    }
-  });
-});
-
-//patronus
-app.post("/patronus", function(req,res){
-  //not exactly sure what this will do
-  console.log("Attempting to write to DB")
-  pg.connect(connectionString, function(err, client, done){
-    if(err){
-      done();
-      console.log("Hey man, we couldn't write anything to your db, sorry :(");
-      res.status(500).send(err);
-    }else{
-      var result = [];
-
-      var query = client.query('INSERT INTO patronus (name) VALUES ($1) '
-                + 'RETURNING id, name', [req.body.name]);
-      query.on('row', function(row){
-        result.push(row);
-      });
-      query.on('error', function(err){
-        done();
-        console.log('Error running query: ', err);
-        res.status(500).send(err);
-      });
-    }
-  });
-});
-
-app.get("/patronus", function(req,res){
-  //not exactly sure what this will do
-  console.log("Attempting to access patronus_table")
-  pg.connect(connectionString, function(err, client, done){
-    if(err){
-      done();
-      console.log("Hey man, we couldn't read anything from your db, sorry :(");
-      res.status(500).send(err);
-    }else{
-      var result = [];
-
-      var query = client.query('SELECT * FROM patronus_table');
-      query.on('row', function(row){
-        result.push(row);
-      });
-      query.on('error', function(err){
-        done();
-        console.log('Error running query: ', err);
-        res.status(500).send(err);
-      });
-    }
-  });
-});
-
-
 
 app.get("/*", function(req,res){
   var file = req.params[0] || "/views/index.html";
